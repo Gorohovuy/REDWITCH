@@ -9,9 +9,13 @@ public class InputReader : ScriptableObject, GameInput.IGameplayActions
 	// so we can skip the null check when we use them
 
     // Gameplay
-    public event UnityAction<Vector2> moveEvent = delegate { };
+    public event UnityAction<Vector2> MoveEvent = delegate { };
+    public event UnityAction<Vector2, bool> CameraMoveEvent = delegate { };
+    public event UnityAction<bool> IsJump = delegate { };
 
     private GameInput gameInput;
+
+    private bool IsDeviceMouse(InputAction.CallbackContext context) => context.control.device.name == "Mouse";
 
     private void OnEnable()
 	{
@@ -33,7 +37,17 @@ public class InputReader : ScriptableObject, GameInput.IGameplayActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        moveEvent.Invoke(context.ReadValue<Vector2>());
+        MoveEvent.Invoke(context.ReadValue<Vector2>());
+    }
+
+    public void OnMoveCamera(InputAction.CallbackContext context)
+    {
+        CameraMoveEvent.Invoke(context.ReadValue<Vector2>(), IsDeviceMouse(context));
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        Debug.Log("Jump");
     }
 
     public void EnableGameplayInput()
